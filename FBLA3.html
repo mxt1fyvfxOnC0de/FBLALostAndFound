@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>School Lost & Found</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  padding: 20px;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+h1 {
+  text-align: center;
+}
+
+button {
+  padding: 12px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+}
+
+.school-btn {
+  width: 100%;
+  margin: 8px 0;
+  background: #1e5bd8;
+  color: white;
+  font-size: 16px;
+}
+
+.back-btn {
+  background: #e5e9f5;
+  color: #1e5bd8;
+  margin-bottom: 15px;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab {
+  flex: 1;
+  background: #e0e6f5;
+  font-weight: bold;
+}
+
+.tab.active {
+  background: #1e5bd8;
+  color: white;
+}
+
+.section { display: none; }
+.section.active { display: block; }
+
+input[type="text"], textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+}
+
+input[type="file"], input[type="email"], select {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+}
+
+button.action {
+  width: 100%;
+  margin-top: 15px;
+  background: #1e5bd8;
+  color: white;
+}
+
+button.danger { background: #c0392b; }
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.card {
+  background: #eef2f5;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SCHOOL SELECTION -->
+<div class="container" id="schoolSelect">
+  <h1>Select a School</h1>
+  <button class="school-btn" onclick="openSchool('Williamsville East High School')">Williamsville East High School</button>
+  <button class="school-btn" onclick="openSchool('Williamsville North High School')">Williamsville North High School</button>
+  <button class="school-btn" onclick="openSchool('Williamsville South High School')">Williamsville South High School</button>
+  <button class="school-btn" onclick="openSchool('Transit Middle School')">Transit Middle School</button>
+  <button class="school-btn" onclick="openSchool('Mill Middle School')">Mill Middle School</button>
+  <button class="school-btn" onclick="openSchool('Heim Middle School')">Heim Middle School</button>
+  <button class="school-btn" onclick="openSchool('Casey Middle School')">Casey Middle School</button>
+  <button class="school-btn" onclick="openSchool('Country Parkway Elementary School')">Country Parkway Elementary School</button>
+  <button class="school-btn" onclick="openSchool('Dodge Elementary School')">Dodge Elementary School</button>
+  <button class="school-btn" onclick="openSchool('Forest Elementary School')">Forest Elementary School</button>
+  <button class="school-btn" onclick="openSchool('Maple East Elementary School')">Maple East Elementary School</button>
+  <button class="school-btn" onclick="openSchool('Maple West Elementary School')">Maple West Elementary School</button>
+  <button class="school-btn" onclick="openSchool('Heim Elementary School')">Heim Elementary School</button>
+</div>
+
+<!-- LOST & FOUND PAGE -->
+<div class="container" id="lostFound" style="display:none;">
+  <button class="back-btn" onclick="goBack()">← Back to School Selection</button>
+  <h1 id="schoolTitle"></h1>
+
+  <div class="tabs">
+    <button class="tab active" onclick="openTab('submit')">Submit Lost Item</button>
+    <button class="tab" onclick="openTab('found')">Found Items</button>
+    <button class="tab" onclick="openAdminTab()">Admin Portal</button>
+  </div>
+
+  <!-- SUBMIT LOST ITEM -->
+  <div class="section active" id="submit">
+    <input type="text" id="lostName" placeholder="Item name">
+    <textarea id="lostDesc" rows="3" placeholder="Description"></textarea>
+    <input type="file" id="lostImage">
+    <button class="action" onclick="submitLost()">Submit</button>
+  </div>
+
+  <!-- FOUND ITEMS -->
+  <div class="section" id="found">
+    <div class="item-grid" id="foundList"></div>
+  </div>
+</div>
+
+<!-- CLAIM FORM -->
+<div class="container" id="claimForm" style="display:none;">
+  <h1>Claim Item</h1>
+  <input type="text" id="claimName" placeholder="Your Name">
+  <input type="text" id="claimGrade" placeholder="Grade">
+  <input type="email" id="claimEmail" placeholder="WITSmail">
+  <button class="action" onclick="submitClaim()">Submit</button>
+  <button class="back-btn" onclick="cancelClaim()">Cancel</button>
+</div>
+
+<!-- ADMIN PAGE -->
+<div class="container" id="adminPage" style="display:none;">
+  <button class="back-btn" onclick="backToLostFound()">← Back to Lost & Found</button>
+  <h1>Admin Portal</h1>
+
+  <h3>Pending Lost Items</h3>
+  <div id="pendingLost"></div>
+
+  <h3>Pending Claims</h3>
+  <div id="pendingClaims"></div>
+
+  <h3>Found Items</h3>
+  <div id="adminFoundList"></div>
+</div>
+
+<script>
+const ADMIN_PASSWORD = "8290";
+
+let pendingLost = [];
+let foundItems = [];
+let pendingClaims = [];
+let currentClaimItem = null; // tracks which item is being claimed
+
+function openSchool(school) {
+  document.getElementById("schoolSelect").style.display = "none";
+  document.getElementById("lostFound").style.display = "block";
+  document.getElementById("schoolTitle").innerText = school + " Lost & Found";
+}
+
+function goBack() {
+  document.getElementById("lostFound").style.display = "none";
+  document.getElementById("schoolSelect").style.display = "block";
+}
+
+function openTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(tab).classList.add('active');
+}
+
+function openAdminTab() {
+  let pass = prompt("Enter admin password:");
+  if (pass === ADMIN_PASSWORD) {
+    document.getElementById("lostFound").style.display = "none";
+    document.getElementById("adminPage").style.display = "block";
+    renderAdminPage();
+  } else alert("Wrong password");
+}
+
+function backToLostFound() {
+  document.getElementById("adminPage").style.display = "none";
+  document.getElementById("lostFound").style.display = "block";
+  renderFound();
+}
+
+function submitLost() {
+  if (!lostName.value || !lostDesc.value) return alert("Fill all fields");
+  const reader = new FileReader();
+  reader.onload = () => {
+    pendingLost.push({ name: lostName.value, desc: lostDesc.value, img: reader.result });
+    alert("Submitted for admin approval");
+    lostName.value = lostDesc.value = lostImage.value = "";
+  };
+  if (lostImage.files[0]) reader.readAsDataURL(lostImage.files[0]);
+}
+
+// Render Found Items without remove button for users
+function renderFound() {
+  foundList.innerHTML = foundItems.map((i, idx) =>
+    `<div class="card">
+      ${i.img ? `<img src="${i.img}">` : ""}
+      <h3>${i.name}</h3>
+      <p>${i.desc}</p>
+      <button onclick="claimItem(${idx})">Claim</button>
+     </div>`).join("");
+}
+
+// When user clicks Claim
+function claimItem(idx) {
+  currentClaimItem = foundItems[idx];
+  document.getElementById("lostFound").style.display = "none";
+  document.getElementById("claimForm").style.display = "block";
+  document.getElementById("claimName").value = "";
+  document.getElementById("claimGrade").value = "";
+  document.getElementById("claimEmail").value = "";
+}
+
+// Submit claim form
+function submitClaim() {
+  const name = document.getElementById("claimName").value;
+  const grade = document.getElementById("claimGrade").value;
+  const email = document.getElementById("claimEmail").value;
+  if (!name || !grade || !email) return alert("Fill all fields");
+  pendingClaims.push({...currentClaimItem, studentName: name, grade, email});
+  alert("Claim submitted for admin approval");
+  document.getElementById("claimForm").style.display = "none";
+  document.getElementById("lostFound").style.display = "block";
+  currentClaimItem = null;
+  renderAdminPage();
+}
+
+function cancelClaim() {
+  document.getElementById("claimForm").style.display = "none";
+  document.getElementById("lostFound").style.display = "block";
+  currentClaimItem = null;
+}
+
+// Admin page rendering
+function renderAdminPage() {
+  pendingLostEl = document.getElementById("pendingLost");
+  pendingLostEl.innerHTML = pendingLost.map((item,i) =>
+    `<div class="card"><strong>${item.name}</strong>
+     <button onclick="approveLost(${i})">Approve</button>
+     <button class="danger" onclick="rejectLost(${i})">Reject</button></div>`).join("");
+
+  pendingClaimsEl = document.getElementById("pendingClaims");
+  pendingClaimsEl.innerHTML = pendingClaims.map((item,i) =>
+    `<div class="card">
+      Claim for <strong>${item.name}</strong> by ${item.studentName}, Grade: ${item.grade}, Email: ${item.email}
+      <br>
+      <button onclick="approveClaim(${i})">Approve</button>
+      <button class="danger" onclick="rejectClaim(${i})">Reject</button>
+    </div>`).join("");
+
+  adminFoundEl = document.getElementById("adminFoundList");
+  adminFoundEl.innerHTML = foundItems.map((item,i) =>
+    `<div class="card">
+      ${item.img ? `<img src="${item.img}">` : ""}
+      <h3>${item.name}</h3>
+      <p>${item.desc}</p>
+      <button class="danger" onclick="removeItem(${i})">Remove</button>
+     </div>`).join("");
+}
+
+// Admin functions
+function approveLost(i) { foundItems.push(pendingLost[i]); pendingLost.splice(i,1); renderAdminPage(); renderFound(); }
+function rejectLost(i) { pendingLost.splice(i,1); renderAdminPage(); }
+function approveClaim(i) { foundItems = foundItems.filter(it => it.name !== pendingClaims[i].name); pendingClaims.splice(i,1); renderAdminPage(); renderFound(); }
+function rejectClaim(i) { pendingClaims.splice(i,1); renderAdminPage(); }
+function removeItem(i) { foundItems.splice(i,1); renderAdminPage(); renderFound(); }
+
+</script>
+
+</body>
+</html>
+
