@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>School Lost & Found</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
 
 <style>
 body {
@@ -114,56 +113,23 @@ button.danger { background: #c0392b; }
 
 <body>
 
-
-  <div class="container" id="schoolSelect">
-
-      
 <!-- SCHOOL SELECTION -->
-
-    
-</form>
 <div class="container" id="schoolSelect">
   <h1>Select a School</h1>
-
-  <input type="text" id="schoolSearch" onkeyup="filterSchools()" placeholder="Search for your school..." style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px;">
-
-  <div id="schoolList">
-    <button class="school-btn" onclick="openSchool('Williamsville East High School')">Williamsville East High School</button>
-    <button class="school-btn" onclick="openSchool('Williamsville North High School')">Williamsville North High School</button>
-    <button class="school-btn" onclick="openSchool('Williamsville South High School')">Williamsville South High School</button>
-    <button class="school-btn" onclick="openSchool('Transit Middle School')">Transit Middle School</button>
-    <button class="school-btn" onclick="openSchool('Mill Middle School')">Mill Middle School</button>
-    <button class="school-btn" onclick="openSchool('Heim Middle School')">Heim Middle School</button>
-    <button class="school-btn" onclick="openSchool('Casey Middle School')">Casey Middle School</button>
-    <button class="school-btn" onclick="openSchool('Country Parkway Elementary School')">Country Parkway Elementary School</button>
-    <button class="school-btn" onclick="openSchool('Dodge Elementary School')">Dodge Elementary School</button>
-    <button class="school-btn" onclick="openSchool('Forest Elementary School')">Forest Elementary School</button>
-    <button class="school-btn" onclick="openSchool('Maple East Elementary School')">Maple East Elementary School</button>
-    <button class="school-btn" onclick="openSchool('Maple West Elementary School')">Maple West Elementary School</button>
-    <button class="school-btn" onclick="openSchool('Heim Elementary School')">Heim Elementary School</button>
-  </div>
+  <button class="school-btn" onclick="openSchool('Williamsville East High School')">Williamsville East High School</button>
+  <button class="school-btn" onclick="openSchool('Williamsville North High School')">Williamsville North High School</button>
+  <button class="school-btn" onclick="openSchool('Williamsville South High School')">Williamsville South High School</button>
+  <button class="school-btn" onclick="openSchool('Transit Middle School')">Transit Middle School</button>
+  <button class="school-btn" onclick="openSchool('Mill Middle School')">Mill Middle School</button>
+  <button class="school-btn" onclick="openSchool('Heim Middle School')">Heim Middle School</button>
+  <button class="school-btn" onclick="openSchool('Casey Middle School')">Casey Middle School</button>
+  <button class="school-btn" onclick="openSchool('Country Parkway Elementary School')">Country Parkway Elementary School</button>
+  <button class="school-btn" onclick="openSchool('Dodge Elementary School')">Dodge Elementary School</button>
+  <button class="school-btn" onclick="openSchool('Forest Elementary School')">Forest Elementary School</button>
+  <button class="school-btn" onclick="openSchool('Maple East Elementary School')">Maple East Elementary School</button>
+  <button class="school-btn" onclick="openSchool('Maple West Elementary School')">Maple West Elementary School</button>
+  <button class="school-btn" onclick="openSchool('Heim Elementary School')">Heim Elementary School</button>
 </div>
-  
-<!-- search bar -->
-<script>
-function filterSchools() {
-  // Get the search input value and convert to lowercase
-  let input = document.getElementById('schoolSearch').value.toLowerCase();
-  
-  // Get all buttons within the school list
-  let buttons = document.querySelectorAll('.school-btn');
-
-  // Loop through buttons and hide those that don't match the search
-  buttons.forEach(btn => {
-    let schoolName = btn.textContent.toLowerCase();
-    if (schoolName.includes(input)) {
-      btn.style.display = "";
-    } else {
-      btn.style.display = "none";
-    }
-  });
-}
-</script>
 
 <!-- LOST & FOUND PAGE -->
 <div class="container" id="lostFound" style="display:none;">
